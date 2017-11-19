@@ -40,7 +40,7 @@ RGB channels all contain information about colors and calculating histograms in 
 
 Cars can look very different, so simple template matching is not efficient. I decided to analyze the R channel from RGB hoping it will help to exclude images that are not cars.
 
-Almost every car in red channel has light pixels on rear lights and license plate. It also has dark pixels on rar window and in the shadow below the car. If image does not have these features it's probably not a car.
+Almost every car in red channel has light pixels on rear lights and license plate. It also has dark pixels on the rear window and in the shadow below the car. If image does not have these features it's probably not a car.
 
 <img src="./img/red.png" />
 
@@ -48,7 +48,7 @@ It's also possible to find such invariants in other color channels, so after som
 
 ### 2.4 Color-based search ###
 
-Car can usually be described as "rectangular object about all having the same color". I tried to search for patterns in color channel, but that does not work well. Colors in the training images are very distorted by compression artifacts.
+Car can usually be described as a "rectangular object about all painted in the same color". I tried to search for patterns in color channel, but that does not work well. Colors in the training images are very distorted by compression artifacts.
 
 <img src="./img/color_noise.jpg" />
 
@@ -58,7 +58,7 @@ I also tried to search for images with low deviation in hue color channel becaus
 
 ### 2.6 Summary ###
 
-I am going to extract HOG features from the highly contrast Y channel. Additionally I am going to use red channel for spatial features.
+I am going to extract HOG features from the highly contrast Y channel. Additionally I am going to use low-resolution RGB channels for spatial features. After some experiments I also decided to add histogram features with small bin count of 16. That helped to detect completely white cars. 
 
 ## 3 Parameters ##
 
@@ -104,7 +104,7 @@ parameters = MyParameters(
  
  ### 5.1 Perspective-based windows ###
  
- In the previous project I learned how to do perspective transformation from the car camera image into the bird-eye view.  The function generate_windows places windows on the road in a rectangular grid and then use inverse transformation to map the back into image coordinates. The advantage of this approach is that the parameters have real world meaning like lane width and length in meters. To compensate possible road turns my grid has trapezoid form with the far side being 15 meters wider in left and right directions. That corresponds curve radius of about 250 meters.
+ In the previous project I learned how to do perspective transformation from the car camera image into the bird-eye view.  The function generate_windows places windows on the road in a rectangular grid and then use inverse transformation to map them back into image coordinates. The advantage of this approach is that the parameters have real world meaning like lane width and length in meters. To compensate possible road turns my grid has trapezoid form with the far side being 15 meters wider in left and right directions. That corresponds to curve radius of about 250 meters.
  
 The resulting window mesh looks like the following:
 
@@ -120,7 +120,7 @@ Another approach is to use sliding windows with fixed step in the bottom part of
 
 To improve the performance it's recommended to calculate gradients once for every group of windows having same size and the just subsample that data in every window. That is implemented in the function find_cars that uses sliding windows technique.
 
-Window sizes are controlled by the scale parameter. For scale values I use geometric progression from 1.5 to 5 in 5 steps. See function calculate_scales.
+Window sizes are controlled by the scale parameter. For scale values I use geometric progression from 1.5 to 3 in 5 steps. See function calculate_scales.
 
 To test how different windows sizes work I painted them in different colors on test images.   
 
@@ -131,6 +131,8 @@ To test how different windows sizes work I painted them in different colors on t
 ## 7. Heat map ##
 
 The technique described above usually finds several matches for the same car, but also can report false positives. To filter out the noise I use heat map that increase the weight of every pixel if it belongs to some window. Islands with the highest weights are then labeled as cars.
+
+To discard glitches in single frames I use a sliding time window of last 5 video frames to calculate heat map. That's done in function process_video_frame, code block 8.
 
 <img src="./img/heat1.png" />  
 
