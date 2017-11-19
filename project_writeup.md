@@ -64,6 +64,21 @@ Cars can look very different, so simple template matching is not efficient. I de
 
 Almost every car in red channel has light pixels on rear lights and license plate. It also has dark pixels on rar window and in the shadow below the car. If image does not have these features it's probably not a car.
 
+### 2.4 Color-based search ###
+
+Car can usually be described as "rectangular object about all having the same color". I tried to search for patterns in color channel, but that does not work well. Colors in the training images are very distorted by compression artifacts.
+
+### 2.5 Color variance search ###
+
+I also tried to search for images with low deviation in hue color channel, because cars are normally painted in one color. That also was not successful.
+
+### 2.6 Summary ###
+
+I am going to extract HOG features from the highly contrast Y channel. Additionally I am going to use red channel for spatial features.
+
+## 3 ## 
+
+
  
  
 
