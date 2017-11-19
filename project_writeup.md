@@ -1,8 +1,3 @@
-## Writeup Template
-### You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
-
----
-
 ## Vehicle Detection Project ##
 
 The goals / steps of this project are the following:
@@ -21,7 +16,7 @@ Code: prepare-data.ipynb
 
 In the first step I prepare a training dataset with list cars and non-cars images. Source files are stored in nested folders, but I prefer to work with plain lists of files. My code traverses recursively folders with images and places PNG files in either ./data/cars or ./data/non-cars folders. Files in different source folder can have same name, so I implemented simple logic to generate unique names by adding suffix if the target file already exists.
 
-To get bigger dataset form every source file I also generate second image flipping it horizontaly.
+To get bigger dataset form every source file I also generate second image flipping it horizontally.
 
 That provided me 17584 car images and 17936 non-car images.
 
@@ -55,6 +50,8 @@ It's also possible to find such invariants in other color channels, so after som
 
 Car can usually be described as "rectangular object about all having the same color". I tried to search for patterns in color channel, but that does not work well. Colors in the training images are very distorted by compression artifacts.
 
+<img src="./img/color_noise.jpg" />
+
 ### 2.5 Color variance search ###
 
 I also tried to search for images with low deviation in hue color channel because cars are normally painted in one color and most pixels are expected to have similar hue values. That also was not successful.
@@ -64,6 +61,8 @@ I also tried to search for images with low deviation in hue color channel becaus
 I am going to extract HOG features from the highly contrast Y channel. Additionally I am going to use red channel for spatial features.
 
 ## 3 Parameters ##
+
+Source code: project.ipynb
 
 I created helper class MyParameters that encapsulates all parameters needed for feature extraction. That makes function calls smaller because I can pass all settings as a single object.
 
@@ -146,7 +145,13 @@ Project video: project_video_output.mp4
  
 ## Discussion
 
-Support vector machine classifieres are very easy to understand and use, but they get very slow on long feature vectors. I think convolution neural network will be much more efficient.
+Currently I use only sliding windows mesh because it's easier to program HOG subsampling, Windows mesh based on perspective transformation is probably better because it automatically ignores cars on the opposite side of the road.
+
+Here I am not sure if detecting cars driving in opposite direction is also desired:
+
+<img src="./img/opposite.jpg" />     
+
+Support vector machine classifiers  are very easy to understand and use, but they get very slow on long feature vectors. I think convolution neural network will be much more efficient.
 
 There is also much improvement potential in filtering and extrapolation results of sequential video frame. For example I could imagine that Kalman filter will be more efficient for tracking cars and predicting their speed and driving direction.
   
